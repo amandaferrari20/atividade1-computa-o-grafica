@@ -115,7 +115,6 @@ void teclas_especiais(int tecla, int x, int y){
             glTranslatef(centroid[0], centroid[1], 0);
             glScalef(scale, scale, 1.0);
             glTranslatef(-centroid[0], -centroid[1], 0);
-            // scale += scale;
         }
         if (tecla == GLUT_KEY_DOWN){
             calcularCentroide(xPos, yPos);
@@ -123,7 +122,6 @@ void teclas_especiais(int tecla, int x, int y){
             glTranslatef(centroid[0], centroid[1], 0);
             glScalef(new_scale, new_scale, 1.0);
             glTranslatef(-centroid[0], -centroid[1], 0);
-            // scale -= scale;
         }
     }
 
