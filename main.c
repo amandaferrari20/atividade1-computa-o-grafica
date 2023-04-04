@@ -1,200 +1,26 @@
 #include <GL/glut.h>
 #include <stdio.h>
-int x1 = 10, x2 = 20, x3 = 20, x4 = 10, xc = 0;
-int yy = 10, y2 = 10, y3 = 20, y4 = 20, yc = 0;
-float angulo = 1.0;
-float scale = 1.0f;
 
-unsigned char mode = 'T';
+float xPos[4] = {10.0, 20.0, 20.0, 10.0};
+float yPos[4] = {10.0, 10.0, 20.0, 20.0};
+float centroid[2] = {5.0, 5.0};
 
-int init(void)
-{
-    glClearColor(1.0, 1.0, 1.0, 0.0); // define a cor de fundo
+float angulo = 5.0;
+float scale = 1.1;
 
-    glMatrixMode(GL_PROJECTION);        // carrega a matriz de projeção
-    gluOrtho2D(0.0, 100.0, 0.0, 100.0); // define projeção ortogonal 2D
-}
+float angleRotated = 0.0;
 
-void desenha_quadrado(void)
-{
-    glClear(GL_COLOR_BUFFER_BIT);
-    // glMatrixMode(GL_MODELVIEW);
-    // glLoadIdentity(); // desenha o fundo (limpa a janela)  
-    // glTranslatef(0.0f, 0.0f, 0.0f);   // altera o atributo de cor
-    glScalef(scale, scale, 1.0f);
-    glColor3f(1.0, 0.0, 0.0);
-    glBegin(GL_QUADS);            // desenha uma linha
-    glVertex2i(x1, yy);
-    glVertex2i(x2, y2);
-    glVertex2i(x3, y3);
-    glVertex2i(x4, y4);
-    glEnd();
-    // glLoadIdentity();
-    glFlush(); // desenha os comandos não executados
-}
+unsigned char mode = 't';
 
-void teclas_normais(unsigned char teclaNormal, int x, int y)
-{ // Controla mode, rotação, transalação e escala
-    if (teclaNormal == 'T')
-    {
-        mode = 'T';
-    }
+void calcularCentroide(float *xPos, float *yPos);
+void display(void);
+int init(void);
+void desenha_quadrado(void);
+void teclas_normais(unsigned char tecla, int x, int y);
+void teclas_especiais(int tecla, int x, int y);
 
-    if (teclaNormal == 'R')
-    {
-        mode = 'R';
-    }
 
-    if (teclaNormal == 'S')
-    {
-        mode = 'S';
-    }
-}
-
-void teclas_especiais(int tecla, int x, int y)
-{ // Controla as setas
-
-    if (mode == 'T')
-    { // Se o mode for T, as setas fazem a translação para o local desejado
-        if (tecla == GLUT_KEY_RIGHT)
-        {
-            glTranslatef(1.0f, 0.0f, 0.0f);
-            x1 += 1;
-            x2 += 1;
-            x3 += 1;
-            x4 += 1;
-        }
-
-        if (tecla == GLUT_KEY_LEFT)
-        {
-            glTranslatef(-1.0f, 0.0f, 0.0f);
-            x1 -= 1;
-            x2 -= 1;
-            x3 -= 1;
-            x4 -= 1;
-        }
-
-        if (tecla == GLUT_KEY_UP)
-        {
-            glTranslatef(0.0f, 1.0f, 0.0f);
-            yy += 1;
-            y2 += 1;
-            y3 += 1;
-            y4 += 1;
-        }
-
-        if (tecla == GLUT_KEY_DOWN)
-        {
-            glTranslatef(0.0f, -1.0f, 0.0f);
-            yy -= 1;
-            y2 -= 1;
-            y3 -= 1;
-            y4 -= 1;
-        }
-    }
-
-    if (mode == 'S')
-    { // Se o mode for S, as setas para cima e para baixo relizam a escala
-        if (tecla == GLUT_KEY_UP)
-        {
-            // x1 -= 1;
-            // x4 -= 1;
-            // x2 += 1;
-            // x3 += 1;
-            // yy -= 1;
-            // y2 -= 1;
-            // y3 += 1;
-            // y4 += 1;
-
-            // glScalef(1.1f, 1.1f, 0.0f);
-
-            scale += 0.1f;
-            // glScalef(scale, scale, 1.0f);
-            
-        }
-
-        if (tecla == GLUT_KEY_DOWN)
-        {
-            // x1 += 1;
-            // x4 += 1;
-            // x2 -= 1;
-            // x3 -= 1;
-            // yy += 1;
-            // y2 += 1;
-            // y3 -= 1;
-            // y4 -= 1;
-
-            scale -= 0.1f;
-        }
-
-        glutPostRedisplay(); 
-    }
-
-    if (mode == 'R')
-    { // Se o mode for R, as setas de esquerda e direira realizam a rotação
-        if (tecla == GLUT_KEY_LEFT)
-        {
-            // glTranslatef(-x1,-yy,0);
-            // printf("X Y %d %d ", x1, yy);
-            // glRotatef(1.0f, 0.0, 0.0, 1.0);
-            // glTranslatef(x1,yy,0);
-            // printf("X Y %d %d ", x1, yy);
-
-            // glMatrixMode(GL_MODELVIEW);
-            // glLoadIdentity();
-            // // do any camera stuff you want
-
-            // glPushMatrix();
-            // // update spin
-
-            // // rotate
-            // glRotatef(0.5, 0, 0, 1);
-
-            // // now draw our square
-
-            // glBegin(GL_QUADS);
-            // desenha_quadrado();
-            // glEnd();
-            // glPopMatrix();
-
-            // glFlush();
-        }
-
-        if (tecla == GLUT_KEY_RIGHT)
-        {
-            calcularCentroide(x1,yy,x2,y2,x3,y3,x4,y4);
-            glTranslatef(-xc, -yc, 0);
-            glRotatef(-angulo, xc, yc, 1.0);
-            glTranslatef(xc, yc, 0);
-
-            desenha_quadrado();
-        }
-    }
-
-    glutPostRedisplay();
-}
-
-void calcularCentroide(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
-    float centroide_x = (x1 + x2 + x3 + x4) / 4;
-    float centroide_y = (y1 + y2 + y3 + y4) / 4;
-    xc = centroide_x;
-    yc = centroide_y;
-}
-
-void display(void)
-{
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    // Desenha o quadrado
-    desenha_quadrado();
-    //angulo += 0.1;
-    // Mostra o resultado na tela
-    glutSwapBuffers();
-}
-
-int main(int argc, char **argv)
-{
-
+int main(int argc, char **argv){
     glutInit(&argc, argv);                       // inicializa o GLUT
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB); // configura o modo de display
     glutInitWindowSize(500, 500);                // configura a largura e altura da janela de exibição
@@ -204,10 +30,129 @@ int main(int argc, char **argv)
     init(); // executa função de inicialização
     glutKeyboardFunc(teclas_normais);
     glutSpecialFunc(teclas_especiais);
-    // glMatrixMode(GL_PROJECTION);
-    // glPushMatrix;
-    // glPopMatrix;
     glutDisplayFunc(display); // estabelece a função "display" como a função callback de exibição.
     glutMainLoop();           // mostre tudo e espere
     return 0;
+}
+
+int init(void){
+    glClearColor(1.0, 1.0, 1.0, 0.0); // define a cor de fundo
+    glMatrixMode(GL_PROJECTION);        // carrega a matriz de projeção
+    gluOrtho2D(0.0, 100.0, 0.0, 100.0); // define projeção ortogonal 2D
+}
+
+void display(void){
+    desenha_quadrado();
+}
+
+void desenha_quadrado(void){
+    glClear(GL_COLOR_BUFFER_BIT);
+    glBegin(GL_QUADS);
+    glColor3f(1.0, 0.0, 0.0);
+    for(int i = 0; i < 4; i++){
+        glVertex2i(xPos[i], yPos[i]);
+    }   
+    glEnd();
+    glFlush();
+}
+
+// Controla mode, rotação, transalação e escala
+void teclas_normais(unsigned char tecla, int x, int y){ 
+    switch (tecla){
+        case 't': mode = 't'; break;
+        case 'r': mode = 'r'; break;
+        case 's': mode = 's'; break;
+        default: break;
+    }
+}
+
+// Controla as setas
+void teclas_especiais(int tecla, int x, int y){ 
+    // Se o mode for T, as setas fazem a translação para o local desejado
+    if (mode == 't'){ 
+        if (tecla == GLUT_KEY_RIGHT){   
+            float new_angle = angleRotated * -1;
+            glRotatef(angleRotated, 0.0, 0.0, 1.0);
+            glTranslatef(1.0f, 0.0f, 0.0f);
+            glRotatef(new_angle, 0.0, 0.0, 1.0);
+            for(int i = 0; i < 4; i++){
+                xPos[i] += 1;
+            }
+        }
+        if (tecla == GLUT_KEY_LEFT){
+            float new_angle = angleRotated * -1;
+            glRotatef(angleRotated, 0.0, 0.0, 1.0);
+            glTranslatef(-1.0f, 0.0f, 0.0f);
+            glRotatef(new_angle, 0.0, 0.0, 1.0);
+            for(int i = 0; i < 4; i++){
+                xPos[i] -= 1;
+            }
+        }
+        if (tecla == GLUT_KEY_UP){
+            float new_angle = angleRotated * -1;
+            glRotatef(angleRotated, 0.0, 0.0, 1.0);
+            glTranslatef(0.0f, 1.0f, 0.0f);
+            glRotatef(new_angle, 0.0, 0.0, 1.0);
+            for(int i = 0; i < 4; i++){
+                yPos[i] += 1;
+            }
+        }
+        if (tecla == GLUT_KEY_DOWN){
+            float new_angle = angleRotated * -1;
+            glRotatef(angleRotated, 0.0, 0.0, 1.0);
+            glTranslatef(0.0f, -1.0f, 0.0f);
+            glRotatef(new_angle, 0.0, 0.0, 1.0);
+            for(int i = 0; i < 4; i++){
+                yPos[i] -= 1;
+            }
+        }
+    }
+
+    // Se o mode for S, as setas para cima e para baixo relizam a escala
+    if (mode == 's'){ 
+        if (tecla == GLUT_KEY_UP){
+            calcularCentroide(xPos, yPos);
+            glTranslatef(centroid[0], centroid[1], 0);
+            glScalef(scale, scale, 1.0);
+            glTranslatef(-centroid[0], -centroid[1], 0);
+            // scale += scale;
+        }
+        if (tecla == GLUT_KEY_DOWN){
+            calcularCentroide(xPos, yPos);
+            float new_scale = 0.9;
+            glTranslatef(centroid[0], centroid[1], 0);
+            glScalef(new_scale, new_scale, 1.0);
+            glTranslatef(-centroid[0], -centroid[1], 0);
+            // scale -= scale;
+        }
+    }
+
+    // Se o mode for R, as setas de esquerda e direira realizam a rotação
+    if (mode == 'r'){ 
+        if (tecla == GLUT_KEY_LEFT){
+            calcularCentroide(xPos, yPos);
+            glTranslatef(centroid[0], centroid[1], 0);
+            glRotatef(angulo, 0.0, 0.0, 1.0);
+            glTranslatef(-centroid[0], -centroid[1], 0);
+            angleRotated += angulo;
+        }
+        if (tecla == GLUT_KEY_RIGHT){
+            calcularCentroide(xPos, yPos);
+            glTranslatef(centroid[0], centroid[1], 0);
+            glRotatef(-angulo, 0.0, 0.0, 1.0);
+            glTranslatef(-centroid[0], -centroid[1], 0);
+            angleRotated -= angulo;
+        }
+    }
+    glutPostRedisplay();
+}
+
+void calcularCentroide(float *xPos, float *yPos) {
+    int sumX = 0, sumY = 0;
+    for(int i = 0; i < 4; i++){
+        sumX += xPos[i];
+        sumY += yPos[i];
+    }
+    centroid[0] = sumX/4;
+    centroid[1] = sumY/4;
 }
