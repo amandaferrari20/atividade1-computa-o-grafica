@@ -3,3 +3,5 @@ all:
 	./main
 	rm main
 	
+clean: 
+	rm main

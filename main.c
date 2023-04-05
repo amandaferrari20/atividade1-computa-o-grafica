@@ -2,6 +2,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#define RES_X 500
+#define RES_Y 500
+
+#define SCREEN_RES_X 1920
+#define SCREEN_RES_Y 1080
+
 float xPos[4] = {10.0, 20.0, 20.0, 10.0};
 float yPos[4] = {10.0, 10.0, 20.0, 20.0};
 float centroid[2] = {5.0, 5.0};
@@ -14,12 +20,17 @@ float angleRotated = 0.0;
 
 unsigned char mode = 't';
 
+char texto[30];
+
 int init(void);
 void display(void);
+void output(int x, int y, float r, float g, float b, int font, char *string);
 void teclas_normais(unsigned char tecla, int x, int y);
 void teclas_especiais(int tecla, int x, int y);
 void desenha_quadrado(void);
+void DesenhaTexto(char *string);
 void calcularCentroide(float *xPos, float *yPos);
+void doTranslateWithRotation(float angle, float x, float y);
 void doRotate(float angle, char direction);
 void doScale(float scale);
 
@@ -27,8 +38,8 @@ void doScale(float scale);
 int main(int argc, char **argv){
     glutInit(&argc, argv);                       // inicializa o GLUT
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB); // configura o modo de display
-    glutInitWindowSize(500, 500);                // configura a largura e altura da janela de exibição
-    glutInitWindowPosition(20, 200);
+    glutInitWindowSize(RES_X, RES_Y);                // configura a largura e altura da janela de exibição
+    glutInitWindowPosition((SCREEN_RES_X/2)-RES_X/2, (SCREEN_RES_Y/2)-RES_Y/2);
     glutCreateWindow("Os melhores do samba"); // cria a janela de exibição
 
     init(); // executa função de inicialização
@@ -52,10 +63,10 @@ void display(void){
 void desenha_quadrado(void){
     glClear(GL_COLOR_BUFFER_BIT);
     glBegin(GL_QUADS);
-    glColor3f(1.0, 0.0, 0.0);
-    for(int i = 0; i < 4; i++){
-        glVertex2i(xPos[i], yPos[i]);
-    }   
+        glColor3f(1.0, 0.0, 0.0);
+        for(int i = 0; i < 4; i++){
+            glVertex2i(xPos[i], yPos[i]);
+        }   
     glEnd();
     glFlush();
 }
@@ -74,88 +85,14 @@ void teclas_normais(unsigned char tecla, int x, int y){
 void teclas_especiais(int tecla, int x, int y){ 
     // Se o mode for T, as setas fazem a translação para o local desejado
     if (mode == 't'){ 
-        if (tecla == GLUT_KEY_RIGHT){   
-            if(angleRotated != 0){
-                if(angleRotated < 0){
-                    calcularCentroide(xPos, yPos);
-                    glTranslatef(centroid[0], centroid[1], 0);
-                    glRotatef(angleRotated * -1, 0.0, 0.0, 1.0);
-                    glTranslatef(-centroid[0], -centroid[1], 0);
-
-                    glTranslatef(1.0f, 0.0f, 0.0f);
-                    
-                    glTranslatef(centroid[0], centroid[1], 0);
-                    glRotatef(angleRotated, 0.0, 0.0, 1.0);
-                    glTranslatef(-centroid[0], -centroid[1], 0);
-                } else {
-                    doRotate((angleRotated * -1), 'r');
-                    glTranslatef(1.0f, 0.0f, 0.0f);
-                    doRotate(angleRotated, 'l');
-                }
-            } else {
-                glTranslatef(1.0f, 0.0f, 0.0f);
-                for(int i = 0; i < 4; i++){
-                    xPos[i] += 1;
-                }
-            }
-        }
-        if (tecla == GLUT_KEY_LEFT){
-            if(angleRotated != 0){
-                calcularCentroide(xPos, yPos);
-                glTranslatef(centroid[0], centroid[1], 0);
-                glRotatef(angleRotated * -1, 0.0, 0.0, 1.0);
-                glTranslatef(-centroid[0], -centroid[1], 0);
-
-                glTranslatef(-1.0f, 0.0f, 0.0f);
-
-                glTranslatef(centroid[0], centroid[1], 0);
-                glRotatef(angleRotated, 0.0, 0.0, 1.0);
-                glTranslatef(-centroid[0], -centroid[1], 0);
-            } else {
-                glTranslatef(-1.0f, 0.0f, 0.0f);
-                for(int i = 0; i < 4; i++){
-                    xPos[i] -= 1;
-                }
-            }
-        }
-        if (tecla == GLUT_KEY_UP){
-            if(angleRotated != 0){
-                calcularCentroide(xPos, yPos);
-                glTranslatef(centroid[0], centroid[1], 0);
-                glRotatef(angleRotated * -1, 0.0, 0.0, 1.0);
-                glTranslatef(-centroid[0], -centroid[1], 0);
-
-                glTranslatef(0.0f, 1.0f, 0.0f);
-
-                glTranslatef(centroid[0], centroid[1], 0);
-                glRotatef(angleRotated, 0.0, 0.0, 1.0);
-                glTranslatef(-centroid[0], -centroid[1], 0);
-            } else {
-                glTranslatef(0.0f, 1.0f, 0.0f);
-                for(int i = 0; i < 4; i++){
-                    yPos[i] += 1;
-                }
-            }
-        }
-        if (tecla == GLUT_KEY_DOWN){
-            if(angleRotated != 0) {
-                calcularCentroide(xPos, yPos);
-                glTranslatef(centroid[0], centroid[1], 0);
-                glRotatef(angleRotated * -1, 0.0, 0.0, 1.0);
-                glTranslatef(-centroid[0], -centroid[1], 0);
-
-                glTranslatef(0.0f, -1.0f, 0.0f);
-
-                glTranslatef(centroid[0], centroid[1], 0);
-                glRotatef(angleRotated, 0.0, 0.0, 1.0);
-                glTranslatef(-centroid[0], -centroid[1], 0);
-            } else {
-                glTranslatef(0.0f, -1.0f, 0.0f);
-                for(int i = 0; i < 4; i++){
-                    yPos[i] -= 1;
-                }
-            }
-        }
+        if (tecla == GLUT_KEY_RIGHT) 
+            doTranslateWithRotation(angleRotated, 1.0, 0.0);
+        if (tecla == GLUT_KEY_LEFT)
+            doTranslateWithRotation(angleRotated, -1.0, 0.0);
+        if (tecla == GLUT_KEY_UP)
+            doTranslateWithRotation(angleRotated, 0.0, 1.0);
+        if (tecla == GLUT_KEY_DOWN)
+            doTranslateWithRotation(angleRotated, 0.0, -1.0);
     }
 
     // Se o mode for S, as setas para cima e para baixo relizam a escala
@@ -170,6 +107,29 @@ void teclas_especiais(int tecla, int x, int y){
         if (tecla == GLUT_KEY_RIGHT) doRotate(-angulo, 'r');
     }
     glutPostRedisplay();
+}
+
+void doTranslateWithRotation(float angle, float x, float y){
+    if(angle != 0){
+        calcularCentroide(xPos, yPos);
+        glTranslatef(centroid[0], centroid[1], 0);
+        glRotatef(angle * -1, 0.0, 0.0, 1.0);
+        glTranslatef(-centroid[0], -centroid[1], 0);
+
+        glTranslatef(x, y, 0.0f);
+        
+        glTranslatef(centroid[0], centroid[1], 0);
+        glRotatef(angle, 0.0, 0.0, 1.0);
+        glTranslatef(-centroid[0], -centroid[1], 0);
+    } else {
+        glTranslatef(x, y, 0.0f);
+        for(int i = 0; i < 4; i++){
+            if(x > 0) xPos[i] += 1;
+            if(x < 0) xPos[i] -= 1;
+            if(y > 0) yPos[i] += 1;
+            if(y < 0) yPos[i] -= 1;
+        }
+    }
 }
 
 void doScale(float scale){
