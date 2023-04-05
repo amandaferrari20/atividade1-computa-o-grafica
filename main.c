@@ -22,7 +22,7 @@ float xPos[NUM_OF_EDGES] = {10.0, 20.0, 20.0, 10.0};
 float yPos[NUM_OF_EDGES] = {10.0, 10.0, 20.0, 20.0};
 float centroid[2] = {5.0, 5.0};
 
-float angulo = 5.0;
+float angleOffset = 5.0;
 float scaleUp = 1.1;
 float scaleDown = 0.9;
 
@@ -110,8 +110,8 @@ void spetialKeys(int key, int x, int y){
 
     // Se o mode for R, as setas de esquerda e direira realizam a rotação
     if (mode == ROTATING_MODE){ 
-        if (key == GLUT_KEY_LEFT) doRotate(angulo, ROTATING_LEFT);
-        if (key == GLUT_KEY_RIGHT) doRotate(-angulo, ROTATING_RIGHT);
+        if (key == GLUT_KEY_LEFT) doRotate(angleOffset, ROTATING_LEFT);
+        if (key == GLUT_KEY_RIGHT) doRotate(-angleOffset, ROTATING_RIGHT);
     }
 
     glutPostRedisplay();
